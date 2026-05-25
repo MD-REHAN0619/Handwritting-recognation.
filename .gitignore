@@ -1,0 +1,26 @@
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Local runtime/cache folders
+.mplconfig/
+.keras-ocr/
+
+# Virtual environments
+venv/
+.venv/
+
+# Model artifacts
+saved_model/*.keras
+saved_model/*.h5
+saved_model/class_names.json
+saved_model/training_summary.json
+static/training_curves.png
+
+# Upload outputs (keep folder tracked)
+static/uploads/*
+!static/uploads/.gitkeep
+
+# IDE / OS noise
+.DS_Store
+Thumbs.db

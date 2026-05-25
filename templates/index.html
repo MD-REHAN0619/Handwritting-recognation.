@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwritten Character Recognition</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="page">
+        <div class="card">
+            <h1>Handwritten Character Recognition</h1>
+            <p class="subtitle">Upload a handwritten digit or alphabet image and get prediction with confidence.</p>
+
+            {% if not model_ready %}
+                <div class="notice warning">
+                    Character model is not loaded yet. You can still use OCR mode, or train with <code>python train.py</code>.
+                </div>
+            {% endif %}
+
+            <form action="/predict" method="post" enctype="multipart/form-data" class="upload-form">
+                <div class="mode-switch">
+                    <label class="mode-option">
+                        <input type="radio" name="recognition_mode" value="character" {% if recognition_mode == "character" %}checked{% endif %}>
+                        Character Mode (CNN)
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="recognition_mode" value="ocr" {% if recognition_mode == "ocr" %}checked{% endif %}>
+                        OCR Mode (Words / PDF)
+                    </label>
+                </div>
+                <label for="image_file">Choose Image</label>
+                <input type="file" name="image_file" id="image_file" accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff,.pdf" required>
+                <button type="submit">Predict</button>
+            </form>
+
+            {% if error_message %}
+                <div class="notice error">{{ error_message }}</div>
+            {% endif %}
+
+            {% if uploaded_file_name and not uploaded_image %}
+                <div class="notice warning">
+                    Uploaded file: <strong>{{ uploaded_file_name }}</strong>
+                </div>
+            {% endif %}
+
+            {% if uploaded_image %}
+                <div class="preview-box">
+                    <h2>Uploaded Image</h2>
+                    <img src="{{ url_for('static', filename=uploaded_image) }}" alt="Uploaded handwritten image">
+                </div>
+            {% endif %}
+
+            {% if predicted_label is not none and confidence is not none %}
+                <div class="result-box">
+                    <h2>Prediction Result</h2>
+                    <p><strong>Predicted Character:</strong> {{ predicted_label }}</p>
+                    <p><strong>Confidence Score:</strong> {{ confidence }}%</p>
+                </div>
+            {% endif %}
+
+            {% if recognized_text %}
+                <div class="result-box">
+                    <h2>OCR Result</h2>
+                    <p><strong>Recognized Text:</strong></p>
+                    <pre class="ocr-text">{{ recognized_text }}</pre>
+                    {% if recognized_confidence is not none %}
+                        <p><strong>OCR Confidence:</strong> {{ recognized_confidence }}%</p>
+                    {% endif %}
+                    {% if ocr_candidates %}
+                        <p><strong>Top Candidates:</strong></p>
+                        <ul class="ocr-candidates">
+                            {% for candidate in ocr_candidates %}
+                                <li>
+                                    <span>{{ candidate.text }}</span>
+                                    {% if candidate.confidence is not none %}
+                                        <small>({{ candidate.confidence }}%)</small>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if show_training_curve %}
+                <div class="curve-box">
+                    <h2>Latest Training Curves</h2>
+                    <img src="{{ url_for('static', filename='training_curves.png') }}" alt="Training accuracy and loss graph">
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
