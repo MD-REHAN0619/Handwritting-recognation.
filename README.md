@@ -2,6 +2,8 @@
 
 A beginner-friendly but fully functional Python mini project that recognizes handwritten **digits and English characters** from images.
 
+For formal submission, see the full report: `TECHNICAL_REPORT.md`
+
 This project is suitable for:
 - College mini project
 - Resume project
@@ -197,10 +199,23 @@ Start app:
 python app.py
 ```
 
+The server binds to `0.0.0.0` by default, uses port `5000` locally, and honors a deployment-provided `PORT` value. For example, in PowerShell:
+
+```powershell
+$env:PORT=5050
+python app.py
+```
+
+Or on Windows (double-click friendly):
+
+```bash
+run_web_preview.bat
+```
+
 Open browser:
 
 ```text
-http://127.0.0.1:5000
+http://localhost:5000
 ```
 
 UI Features:

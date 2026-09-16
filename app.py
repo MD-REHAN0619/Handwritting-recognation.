@@ -1,5 +1,6 @@
 """Flask web app for handwritten character recognition."""
 
+import os
 from datetime import datetime
 from pathlib import Path
 
@@ -186,4 +187,20 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    # Keep Matplotlib cache writable in local project for stable startup on Windows.
+    mpl_cache_dir = BASE_DIR / ".mplconfig"
+    mpl_cache_dir.mkdir(parents=True, exist_ok=True)
+    os.environ.setdefault("MPLCONFIGDIR", str(mpl_cache_dir))
+
+    host = os.environ.get("FLASK_HOST", "0.0.0.0")
+    raw_port = os.environ.get("PORT", os.environ.get("FLASK_PORT", "5000"))
+    try:
+        port = int(raw_port)
+    except ValueError as error:
+        raise SystemExit(f"PORT or FLASK_PORT must be an integer, got {raw_port!r}.") from error
+    if not 1 <= port <= 65535:
+        raise SystemExit("PORT or FLASK_PORT must be between 1 and 65535.")
+    debug = os.environ.get("FLASK_DEBUG", "0").strip().lower() in {"1", "true", "yes"}
+
+    # Disable reloader unless debug is explicitly enabled.
+    app.run(host=host, port=port, debug=debug, use_reloader=debug)
